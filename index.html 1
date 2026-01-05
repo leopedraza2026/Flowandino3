@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flow Andino - Moda Online</title>
+    <style>
+        /* --- Estilos Generales --- */
+        :root {
+            --primary: #D97757;
+            --secondary: #2C3E50;
+            --accent: #F4A261;
+            --bg-light: #FDFBF7;
+            --white: #ffffff;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body { background-color: var(--bg-light); color: #333; line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
+
+        /* --- Navegación --- */
+        header { background-color: var(--secondary); color: var(--white); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); }
+        .logo { font-size: 1.5rem; font-weight: bold; color: var(--accent); cursor: pointer; }
+        nav ul { list-style: none; display: flex; gap: 1.5rem; }
+        nav a { color: var(--white); text-decoration: none; cursor: pointer; font-size: 0.95rem; }
+        nav a:hover { color: var(--accent); }
+        .btn-login { background-color: var(--primary); padding: 0.5rem 1rem; border-radius: 4px; color: white; font-weight: bold; }
+
+        /* --- Vistas --- */
+        main { flex: 1; padding: 2rem; max-width: 1200px; margin: 0 auto; width: 100%; }
+        .view-section { display: none; animation: fadeIn 0.5s ease; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Landing --- */
+        #landing-view { text-align: center; padding: 4rem 1rem; }
+        .hero-title { font-size: 3rem; margin-bottom: 1rem; color: var(--secondary); }
+        .hero-quote { font-style: italic; color: #666; margin-bottom: 2rem; }
+        .whatsapp-btn { background: #25D366; color: white; padding: 0.8rem 1.5rem; border-radius: 50px; text-decoration: none; display: inline-block; margin-top: 1rem; font-weight: bold; }
+
+        /* --- Tienda --- */
+        .shop-filters { background: white; padding: 1rem; border-radius: 8px; box-shadow: var(--shadow); margin-bottom: 2rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+        .filter-group { display: flex; flex-direction: column; gap: 0.3rem; min-width: 200px; }
+        .filter-select { padding: 0.6rem; border: 1px solid #ddd; border-radius: 4px; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; }
+        .product-card { background: var(--white); border-radius: 8px; overflow: hidden; box-shadow: var(--shadow); transition: transform 0.2s; display: flex; flex-direction: column; }
+        .product-card:hover { transform: translateY(-5px); }
+        .product-img { width: 100%; height: 300px; object-fit: cover; background-color: #eee; }
+        .product-info { padding: 1rem; flex: 1; display: flex; flex-direction: column; }
+        .product-badges { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+        .badge { font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 4px; background: #eee; text-transform: uppercase; }
+        .badge.dept { background-color: #E0F7FA; color: #006064; }
+        .badge.cat { background-color: #FFF3E0; color: #E65100; }
+        .product-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .product-price { color: var(--primary); font-size: 1.2rem; font-weight: bold; margin-bottom: 1rem; }
+        
+        /* Botón de Contacto Nuevo */
+        .btn-contact-seller {
+            margin-top: auto;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+        }
+        .btn-contact-seller:hover { background-color: #34495e; }
+
+        /* --- Login & Formularios --- */
+        .form-group { margin-bottom: 1rem; text-align: left; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
+        .form-group input, .form-group select { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px; }
+        .btn-primary { background-color: var(--primary); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 4px; cursor: pointer; width: 100%; font-size: 1rem; font-weight: bold; }
+        
+        .login-container { max-width: 400px; margin: 3rem auto; background: var(--white); padding: 2rem; border-radius: 8px; box-shadow: var(--shadow); text-align: center; }
+
+        /* --- Dashboard --- */
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; }
+        @media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr; } }
+        
+        .panel-card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: var(--shadow); margin-bottom: 2rem; }
+        .panel-card h3 { border-bottom: 2px solid #eee; padding-bottom: 0.5rem; margin-bottom: 1rem; color: var(--secondary); }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { padding: 0.8rem; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: var(--secondary); color: white; }
+        
+        .btn-edit { background-color: #3498db; color: white; border: none; padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; margin-right: 5px; }
+        .btn-delete { background-color: var(--danger); color: white; border: none; padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
+
+        /* --- Modal --- */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 200; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; padding: 2rem; border-radius: 8px; width: 90%; max-width: 500px; position: relative; max-height: 90vh; overflow-y: auto; }
+        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; }
+        .image-upload-container { border: 2px dashed #ddd; padding: 1rem; text-align: center; border-radius: 8px; margin-bottom: 1rem; }
+        #img-preview { max-width: 100%; max-height: 200px; margin-top: 10px; display: none; border-radius: 4px; }
+
+        /* --- Toast --- */
+        .toast { position: fixed; bottom: 20px; right: 20px; background: var(--secondary); color: white; padding: 1rem 2rem; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); opacity: 0; transition: all 0.3s; z-index: 1000; transform: translateY(20px); }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+        
+        /* --- Contact Info Box --- */
+        .contact-info-box {
+            background: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 10px;
+            display: none;
+        }
+        .contact-info-box.show { display: block; animation: fadeIn 0.3s; }
+
+        footer { text-align: center; padding: 1.5rem; background: var(--secondary); color: #aaa; margin-top: auto; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo" onclick="app.navigate('landing')">FLOW ANDINO</div>
+        <nav>
+            <ul>
+                <li><a onclick="app.navigate('landing')">Inicio</a></li>
+                <li><a onclick="app.navigate('shop')">Tienda</a></li>
+                <li id="nav-dashboard" style="display:none;"><a onclick="app.navigate('dashboard')">Panel</a></li>
+                <li id="nav-login"><a class="btn-login" onclick="app.navigate('login')">Acceso</a></li>
+                <li id="nav-logout" style="display:none;"><a onclick="app.auth.logout()">Salir</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- LANDING -->
+        <section id="landing-view" class="view-section active">
+            <h1 class="hero-title">Bienvenido a Flow Andino</h1>
+            <p class="hero-quote">"La moda no es solo ropa, es la forma en que contamos nuestra historia al mundo."</p>
+            <br>
+            <button class="btn-primary" style="width: auto; padding: 1rem 2rem;" onclick="app.navigate('shop')">Ver Catálogo</button>
+            <div class="panel-card" style="display: inline-block; margin-top: 2rem;">
+                <h3>¿Quieres vender con nosotros?</h3>
+                <p>Únete a nuestra red de vendedores.</p>
+                <a href="https://wa.me/59161348083" target="_blank" class="whatsapp-btn">📱 Marcar al 61348083</a>
+            </div>
+        </section>
+
+        <!-- TIENDA -->
+        <section id="shop-view" class="view-section">
+            <div class="shop-filters">
+                <div class="filter-group">
+                    <label>📍 Departamento</label>
+                    <select id="filter-dept" class="filter-select" onchange="app.products.renderShop()">
+                        <option value="Todos">Todos</option>
+                        <option value="La Paz">La Paz</option>
+                        <option value="Santa Cruz">Santa Cruz</option>
+                        <option value="Cochabamba">Cochabamba</option>
+                        <option value="Oruro">Oruro</option>
+                        <option value="Potosí">Potosí</option>
+                        <option value="Chuquisaca">Chuquisaca</option>
+                        <option value="Tarija">Tarija</option>
+                        <option value="Beni">Beni</option>
+                        <option value="Pando">Pando</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>👕 Prenda</label>
+                    <select id="filter-cat" class="filter-select" onchange="app.products.renderShop()">
+                        <option value="Todos">Todas</option>
+                        <option value="Ropa General">General</option>
+                        <option value="Blusas">Blusas</option>
+                        <option value="Poleras">Poleras</option>
+                        <option value="Pantalones">Pantalones</option>
+                        <option value="Vestidos">Vestidos</option>
+                        <option value="Chompas">Chompas</option>
+                    </select>
+                </div>
+            </div>
+            <div id="shop-container" class="products-grid"></div>
+        </section>
+
+        <!-- LOGIN -->
+        <section id="login-view" class="view-section">
+            <div class="login-container">
+                <h2>Acceso Vendedores</h2>
+                <div class="form-group"><label>Usuario</label><input type="text" id="login-user"></div>
+                <div class="form-group"><label>Contraseña</label><input type="password" id="login-pass"></div>
+                <button class="btn-primary" onclick="app.auth.login()">Ingresar</button>
+            </div>
+        </section>
+
+        <!-- DASHBOARD -->
+        <section id="dashboard-view" class="view-section">
+            <div class="dashboard-grid">
+                <!-- COLUMNA IZQUIERDA: PERFIL Y OPCIONES -->
+                <div class="sidebar">
+                    
+                    <!-- Panel de Perfil (Para Vendedores) -->
+                    <div id="profile-panel" class="panel-card" style="display:none;">
+                        <h3>👤 Mi Perfil</h3>
+                        <p style="font-size:0.8rem; color:#666; margin-bottom:10px;">Actualiza tus datos para que los clientes te contacten.</p>
+                        <div class="form-group">
+                            <label>Teléfono / WhatsApp</label>
+                            <input type="text" id="profile-phone" placeholder="Ej: 70012345">
+                        </div>
+                        <div class="form-group">
+                            <label>Dirección / Ciudad</label>
+                            <input type="text" id="profile-address" placeholder="Ej: Calle 10, Zona Sur">
+                        </div>
+                        <button class="btn-primary" onclick="app.auth.updateProfile()">Guardar Perfil</button>
+
+                        <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid #eee;">
+                        
+                        <h4>🔒 Cambiar Contraseña</h4>
+                        <div class="form-group" style="margin-top:10px;">
+                            <input type="password" id="pass-current" placeholder="Contraseña actual" style="margin-bottom:5px;">
+                            <input type="password" id="pass-new" placeholder="Nueva contraseña">
+                        </div>
+                        <button class="btn-primary" style="background-color: var(--secondary);" onclick="app.auth.updatePassword()">Cambiar</button>
+                    </div>
+
+                    <!-- Panel de Admin -->
+                    <div id="admin-panel" class="panel-card" style="display:none;">
+                        <h3>⚙️ Administrador</h3>
+                        <h4>Crear Vendedor</h4>
+                        <div class="form-group"><input type="text" id="new-seller-user" placeholder="Usuario"></div>
+                        <div class="form-group"><input type="text" id="new-seller-pass" placeholder="Contraseña"></div>
+                        <button class="btn-primary" onclick="app.admin.createSeller()">Crear</button>
+                        
+                        <h4 style="margin-top:1rem;">Vendedores</h4>
+                        <ul id="sellers-list-ul" style="list-style:none; padding:0; margin-top:0.5rem; font-size:0.9rem;"></ul>
+                    </div>
+                </div>
+
+                <!-- COLUMNA DERECHA: PRODUCTOS -->
+                <div class="content">
+                    <div class="panel-card" style="display:flex; justify-content:space-between; align-items:center;">
+                        <h3>📦 Mis Productos</h3>
+                        <button class="btn-primary" style="width:auto;" onclick="app.products.openModal()">+ Agregar Ropa</button>
+                    </div>
+                    <div style="overflow-x:auto;">
+                        <table id="my-products-table">
+                            <thead><tr><th>Imagen</th><th>Producto</th><th>Precio</th><th>Acciones</th></tr></thead>
+                            <tbody id="my-products-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Flow Andino. Base de datos local activa.</p>
+    </footer>
+
+    <!-- MODAL PRODUCTO -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="app.products.closeModal()">&times;</span>
+            <h3>Agregar Ropa</h3>
+            <input type="hidden" id="prod-id">
+            <input type="hidden" id="prod-img-data">
+            
+            <div class="form-group">
+                <label>Imagen (Puede ser grande)</label>
+                <div class="image-upload-container">
+                    <input type="file" id="prod-img-file" accept="image/*" onchange="app.products.handleImageUpload(this)">
+                    <small>Selecciona foto de galería</small>
+                    <img id="img-preview" src="" alt="Vista previa">
+                </div>
+            </div>
+            <div class="form-group"><label>Nombre</label><input type="text" id="prod-name"></div>
+            <div style="display:flex; gap:10px;">
+                <div class="form-group" style="flex:1">
+                    <label>Depto</label>
+                    <select id="prod-dept">
+                        <option value="La Paz">La Paz</option><option value="Santa Cruz">Santa Cruz</option><option value="Cochabamba">Cochabamba</option><option value="Oruro">Oruro</option><option value="Potosí">Potosí</option><option value="Chuquisaca">Chuquisaca</option><option value="Tarija">Tarija</option><option value="Beni">Beni</option><option value="Pando">Pando</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex:1">
+                    <label>Tipo</label>
+                    <select id="prod-cat">
+                        <option value="Ropa General">General</option><option value="Blusas">Blusas</option><option value="Poleras">Poleras</option><option value="Pantalones">Pantalones</option><option value="Vestidos">Vestidos</option><option value="Chompas">Chompas</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group"><label>Precio (Bs)</label><input type="number" id="prod-price"></div>
+            <button class="btn-primary" onclick="app.products.save()">Guardar</button>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">Mensaje</div>
+
+    <script>
+        /* --- 1. BASE DE DATOS (IndexedDB) --- */
+        // Esta capa maneja el almacenamiento grande de forma asíncrona
+        const DB = {
+            dbName: 'FlowAndinoDB',
+            version: 1,
+            db: null,
+
+            init: async () => {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open(DB.dbName, DB.version);
+
+                    request.onupgradeneeded = (event) => {
+                        const db = event.target.result;
+                        // Crear almacenes si no existen
+                        if (!db.objectStoreNames.contains('users')) db.createObjectStore('users', { keyPath: 'id', autoIncrement: true });
+                        if (!db.objectStoreNames.contains('products')) db.createObjectStore('products', { keyPath: 'id', autoIncrement: true });
+                    };
+
+                    request.onsuccess = (event) => {
+                        DB.db = event.target.result;
+                        console.log("Base de datos conectada.");
+                        resolve(DB.db);
+                    };
+
+                    request.onerror = (event) => reject("Error DB: " + event.target.errorCode);
+                });
+            },
+
+            // Helpers genéricos
+            getAll: async (storeName) => {
+                return new Promise((resolve) => {
+                    const tx = DB.db.transaction(storeName, 'readonly');
+                    const store = tx.objectStore(storeName);
+                    const request = store.getAll();
+                    request.onsuccess = () => resolve(request.result);
+                });
+            },
+
+            put: async (storeName, data) => {
+                return new Promise((resolve) => {
+                    const tx = DB.db.transaction(storeName, 'readwrite');
+                    const store = tx.objectStore(storeName);
+                    store.put(data);
+                    tx.oncomplete = () => resolve();
+                });
+            },
+
+            delete: async (storeName, id) => {
+                return new Promise((resolve) => {
+                    const tx = DB.db.transaction(storeName, 'readwrite');
+                    const store = tx.objectStore(storeName);
+                    store.delete(id);
+                    tx.oncomplete = () => resolve();
+                });
+            }
+        };
+
+        /* --- 2. LÓGICA DE LA APP --- */
+        const app = {
+            state: {
+                currentUser: null,
+                users: [],
+                products: []
+            },
+
+            init: async () => {
+                try {
+                    await DB.init(); // Conectar a la BD
+                    await app.loadData(); // Cargar datos
+                    
+                    // Si está vacío, sembrar datos iniciales
+                    if (app.state.users.length === 0) {
+                        await app.seedData();
+                    }
+                    
+                    // Verificar sesión (simple check en memoria, no persistente por seguridad en este demo)
+                    app.state.currentUser = null;
+                    app.ui.updateNav();
+                } catch (e) {
+                    console.error(e);
+                    app.ui.toast("Error cargando base de datos", 'error');
+                }
+            },
+
+            loadData: async () => {
+                app.state.users = await DB.getAll('users');
+                app.state.products = await DB.getAll('products');
+            },
+
+            seedData: async () => {
+                // Datos iniciales
+                const admin = { user: 'admin', pass: '1234', role: 'admin', phone: '', address: '' };
+                const seller = { user: 'vendedor', pass: '1234', role: 'seller', phone: '70000000', address: 'Zona Central' };
+                
+                await DB.put('users', admin);
+                await DB.put('users', seller);
+
+                const p1 = { name: 'Chompa Andina', price: 250, department: 'La Paz', category: 'Chompas', img: 'https://picsum.photos/seed/ch/400/400', sellerId: 1 }; // sellerId provisional
+                const p2 = { name: 'Blusa Floral', price: 120, department: 'Santa Cruz', category: 'Blusas', img: 'https://picsum.photos/seed/bl/400/400', sellerId: 2 };
+                
+                // Nota: IDs se generan automaticamente al poner, pero necesitamos recuperar el ID real para asociar
+                await DB.put('products', p1);
+                await DB.put('products', p2);
+                
+                // Recargar para tener los IDs correctos
+                await app.loadData();
+            },
+
+            /* --- AUTENTICACIÓN Y PERFIL --- */
+            auth: {
+                login: async () => {
+                    const u = document.getElementById('login-user').value;
+                    const p = document.getElementById('login-pass').value;
+                    const found = app.state.users.find(user => user.user === u && user.pass === p);
+
+                    if (found) {
+                        app.state.currentUser = found;
+                        app.ui.toast(`Bienvenido ${found.user}`, 'success');
+                        app.ui.updateNav();
+                        app.navigate('dashboard');
+                        // Cargar datos del perfil en el formulario
+                        document.getElementById('profile-phone').value = found.phone || '';
+                        document.getElementById('profile-address').value = found.address || '';
+                    } else {
+                        app.ui.toast('Datos incorrectos', 'error');
+                    }
+                },
+                logout: () => {
+                    app.state.currentUser = null;
+                    app.ui.updateNav();
+                    app.navigate('landing');
+                },
+                updateProfile: async () => {
+                    const phone = document.getElementById('profile-phone').value;
+                    const address = document.getElementById('profile-address').value;
+                    const user = app.state.currentUser;
+
+                    if (!user) return;
+
+                    user.phone = phone;
+                    user.address = address;
+                    
+                    // Actualizar en BD
+                    await DB.put('users', user);
+                    
+                    // Actualizar lista local
+                    const idx = app.state.users.findIndex(u => u.id === user.id);
+                    if(idx !== -1) app.state.users[idx] = user;
+
+                    app.ui.toast('Perfil actualizado', 'success');
+                },
+                updatePassword: async () => {
+                    const current = document.getElementById('pass-current').value;
+                    const newPass = document.getElementById('pass-new').value;
+                    const user = app.state.currentUser;
+
+                    if (user.pass !== current) {
+                        app.ui.toast('Contraseña actual incorrecta', 'error');
+                        return;
+                    }
+                    if (newPass.length < 4) return;
+
+                    user.pass = newPass;
+                    await DB.put('users', user);
+                    
+                    // Actualizar lista local
+                    const idx = app.state.users.findIndex(u => u.id === user.id);
+                    if(idx !== -1) app.state.users[idx] = user;
+
+                    app.ui.toast('Contraseña cambiada', 'success');
+                    document.getElementById('pass-current').value = '';
+                    document.getElementById('pass-new').value = '';
+                }
+            },
+
+            /* --- PRODUCTOS --- */
+            products: {
+                renderShop: async () => {
+                    const container = document.getElementById('shop-container');
+                    container.innerHTML = '';
+                    
+                    const deptFilter = document.getElementById('filter-dept').value;
+                    const catFilter = document.getElementById('filter-cat').value;
+
+                    let filtered = app.state.products;
+                    if (deptFilter !== 'Todos') filtered = filtered.filter(p => p.department === deptFilter);
+                    if (catFilter !== 'Todos') filtered = filtered.filter(p => p.category === catFilter);
+
+                    if (filtered.length === 0) {
+                        container.innerHTML = '<p style="grid-column:1/-1; text-align:center;">No hay productos.</p>';
+                        return;
+                    }
+
+                    filtered.forEach(p => {
+                        // Buscar vendedor para mostrar datos de contacto
+                        const seller = app.state.users.find(u => u.id === p.sellerId) || { phone: 'No disponible', address: '', user: 'Desconocido' };
+                        
+                        // Crear tarjeta
+                        const card = document.createElement('div');
+                        card.className = 'product-card';
+                        
+                        // ID único para la caja de contacto
+                        const contactId = `contact-${p.id}`;
+
+                        card.innerHTML = `
+                            <img src="${p.img}" class="product-img">
+                            <div class="product-info">
+                                <div class="product-badges">
+                                    <span class="badge dept">${p.department}</span>
+                                    <span class="badge cat">${p.category}</span>
+                                </div>
+                                <div class="product-title">${p.name}</div>
+                                <div class="product-price">Bs. ${parseFloat(p.price).toLocaleString('es-BO')}</div>
+                                
+                                <button class="btn-contact-seller" onclick="app.ui.toggleContact('${contactId}')">
+                                    📞 Contactar Vendedor
+                                </button>
+                                
+                                <div id="${contactId}" class="contact-info-box">
+                                    <strong>Vendedor:</strong> ${seller.user}<br>
+                                    <strong>Teléfono:</strong> <a href="tel:${seller.phone}" style="color:var(--primary)">${seller.phone}</a><br>
+                                    <strong>Ubicación:</strong> ${seller.address}
+                                </div>
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
+                },
+                handleImageUpload: (input) => {
+                    if (input.files && input.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            document.getElementById('img-preview').src = e.target.result;
+                            document.getElementById('img-preview').style.display = 'block';
+                            document.getElementById('prod-img-data').value = e.target.result;
+                        };
+                        reader.readAsDataURL(input.files[0]);
+                    }
+                },
+                openModal: (isEdit = false) => {
+                    document.getElementById('product-modal').classList.add('active');
+                    if(!isEdit) {
+                        document.getElementById('prod-id').value = '';
+                        document.getElementById('prod-name').value = '';
+                        document.getElementById('prod-dept').value = 'La Paz';
+                        document.getElementById('prod-cat').value = 'Ropa General';
+                        document.getElementById('prod-price').value = '';
+                        document.getElementById('prod-img-file').value = '';
+                        document.getElementById('img-preview').style.display = 'none';
+                        document.getElementById('prod-img-data').value = '';
+                    }
+                },
+                save: async () => {
+                    const id = document.getElementById('prod-id').value;
+                    const name = document.getElementById('prod-name').value;
+                    const dept = document.getElementById('prod-dept').value;
+                    const cat = document.getElementById('prod-cat').value;
+                    const price = document.getElementById('prod-price').value;
+                    let img = document.getElementById('prod-img-data').value;
+
+                    if(!name || !price) return app.ui.toast('Faltan datos', 'error');
+                    if(!img) img = "https://picsum.photos/seed/noprod/400/400";
+
+                    if(id) {
+                        // Editar
+                        const idx = app.state.products.findIndex(p => p.id == id);
+                        if(idx !== -1) {
+                            app.state.products[idx] = { ...app.state.products[idx], name, price, img, department: dept, category: cat };
+                            await DB.put('products', app.state.products[idx]);
+                        }
+                    } else {
+                        // Nuevo
+                        const newProd = { name, price, img, department: dept, category: cat, sellerId: app.state.currentUser.id };
+                        await DB.put('products', newProd);
+                        // Recargar lista para obtener el ID real generado por BD
+                        await app.loadData(); 
+                    }
+                    app.ui.toast('Guardado', 'success');
+                    app.products.closeModal();
+                    app.dashboard.renderProducts();
+                },
+                delete: async (id) => {
+                    if(confirm('¿Borrar?')) {
+                        await DB.delete('products', parseInt(id));
+                        app.state.products = app.state.products.filter(p => p.id !== id);
+                        app.dashboard.renderProducts();
+                    }
+                },
+                closeModal: () => {
+                    document.getElementById('product-modal').classList.remove('active');
+                }
+            },
+
+            /* --- ADMIN --- */
+            admin: {
+                createSeller: async () => {
+                    const u = document.getElementById('new-seller-user').value;
+                    const p = document.getElementById('new-seller-pass').value;
+                    if(!u || !p) return;
+                    if(app.state.users.find(x => x.user === u)) return app.ui.toast('Usuario existe', 'error');
+
+                    await DB.put('users', { user: u, pass: p, role: 'seller', phone: '', address: '' });
+                    await app.loadData();
+                    app.dashboard.renderAdmin();
+                    app.ui.toast('Vendedor creado', 'success');
+                },
+                deleteSeller: async (id) => {
+                    if(confirm('¿Eliminar vendedor?')) {
+                        await DB.delete('users', parseInt(id));
+                        app.state.users = app.state.users.filter(u => u.id !== id);
+                        app.dashboard.renderAdmin();
+                    }
+                }
+            },
+
+            /* --- DASHBOARD RENDER --- */
+            dashboard: {
+                render: () => {
+                    const user = app.state.currentUser;
+                    document.getElementById('profile-panel').style.display = 'none';
+                    document.getElementById('admin-panel').style.display = 'none';
+
+                    if(user.role === 'admin') {
+                        document.getElementById('admin-panel').style.display = 'block';
+                        app.dashboard.renderAdmin();
+                        // El admin no tiene lista de productos en este demo, o podría ver todos
+                        document.querySelector('.content').style.display = 'none'; 
+                    } else {
+                        document.getElementById('profile-panel').style.display = 'block';
+                        document.querySelector('.content').style.display = 'block';
+                        app.dashboard.renderProducts();
+                    }
+                },
+                renderProducts: () => {
+                    const tbody = document.getElementById('my-products-body');
+                    tbody.innerHTML = '';
+                    const myProducts = app.state.products.filter(p => p.sellerId === app.state.currentUser.id);
+                    
+                    myProducts.forEach(p => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td><img src="${p.img}" style="width:40px;height:40px;object-fit:cover;"></td>
+                            <td>${p.name}<br><small>${p.department}</small></td>
+                            <td>Bs ${p.price}</td>
+                            <td>
+                                <button class="btn-delete" onclick="app.products.delete(${p.id})">Borrar</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                },
+                renderAdmin: () => {
+                    const ul = document.getElementById('sellers-list-ul');
+                    ul.innerHTML = '';
+                    const sellers = app.state.users.filter(u => u.role === 'seller');
+                    sellers.forEach(s => {
+                        const li = document.createElement('li');
+                        li.style.display = 'flex';
+                        li.style.justifyContent = 'space-between';
+                        li.style.marginBottom = '5px';
+                        li.innerHTML = `<span>${s.user} (${s.phone || 'Sin tel'})</span> <button class="btn-delete" onclick="app.admin.deleteSeller(${s.id})">X</button>`;
+                        ul.appendChild(li);
+                    });
+                }
+            },
+
+            /* --- UI Y NAVEGACIÓN --- */
+            navigate: (view) => {
+                document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+                
+                if (view === 'shop') {
+                    document.getElementById('shop-view').classList.add('active');
+                    app.products.renderShop();
+                } else if (view === 'dashboard') {
+                    if(!app.state.currentUser) return app.navigate('login');
+                    document.getElementById('dashboard-view').classList.add('active');
+                    app.dashboard.render();
+                } else if (view === 'login') {
+                    if(app.state.currentUser) return app.navigate('dashboard');
+                    document.getElementById('login-view').classList.add('active');
+                } else {
+                    document.getElementById('landing-view').classList.add('active');
+                }
+                window.scrollTo(0,0);
+            },
+
+            ui: {
+                updateNav: () => {
+                    const user = app.state.currentUser;
+                    document.getElementById('nav-login').style.display = user ? 'none' : 'block';
+                    document.getElementById('nav-logout').style.display = user ? 'block' : 'none';
+                    document.getElementById('nav-dashboard').style.display = user ? 'block' : 'none';
+                },
+                toast: (msg, type='success') => {
+                    const t = document.getElementById('toast');
+                    t.textContent = msg;
+                    t.className = `toast show ${type}`;
+                    setTimeout(() => t.classList.remove('show'), 3000);
+                },
+                toggleContact: (id) => {
+                    const el = document.getElementById(id);
+                    if(el.classList.contains('show')) el.classList.remove('show');
+                    else el.classList.add('show');
+                }
+            }
+        };
+
+        // INICIAR
+        document.addEventListener('DOMContentLoaded', app.init);
+
+    </script>
+</body>
+</html>
